@@ -3,27 +3,49 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MovieController extends Controller
 {
+
     public function index(Request $request): JsonResponse
     {
         $page = $request->input('page', 1);
-        $limit = $request->input('limit', 30); 
+        $limit = $request->input('limit', 30);
+        $genreIdsString = $request->input('genres');
 
-        $movies = Movie::paginate($limit, ['id', 'title', 'release_date', 'runtime', 'score', 'poster_id'], 'page', $page)
-            ->map(function ($movie) {
-                return [
-                    'id' => $movie->id,
-                    'title' => $movie->title,
-                    'releaseYear' => $movie->release_date ? (int) date('Y', strtotime($movie->release_date)) : null,
-                    'duration' => $movie->runtime,
-                    'score' => $movie->score,
-                    'posterId' => $movie->poster_id,
-                ];
+        Log::info('Petición de películas recibida:', [
+            'page' => $page,
+            'limit' => $limit,
+            'genres' => $genreIdsString,
+            'all_request_data' => $request->all(),
+        ]);
+
+        $query = Movie::query()->select(['id', 'title', 'release_date', 'runtime', 'score', 'poster_id']);
+
+        if ($genreIdsString) {
+            $genreIds = explode(',', $genreIdsString);
+            Log::info('Filtrando por géneros:', ['genre_ids' => $genreIds]);
+            $query->whereHas('genres', function ($query) use ($genreIds) {
+                $query->whereIn('genres.id', $genreIds);
             });
+        }
+
+        $movies = $query->paginate($limit, ['*'], 'page', $page)->map(function ($movie) {
+            return [
+                'id' => $movie->id,
+                'title' => $movie->title,
+                'releaseYear' => $movie->release_date ? (int) date('Y', strtotime($movie->release_date)) : null,
+                'duration' => $movie->runtime,
+                'score' => $movie->score,
+                'posterId' => $movie->poster_id,
+            ];
+        });
+
+        Log::info('Filtrando por géneros:', ['moviessss' => $movies]);
+
 
         return response()->json($movies);
     }
