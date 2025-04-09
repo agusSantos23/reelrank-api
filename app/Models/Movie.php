@@ -70,4 +70,12 @@ class Movie extends Model
             }
         });
     }
+
+    /**
+     * The genres that belong to the movie.
+     */
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'movie_genres', 'movie_id', 'genre_id');
+    }
 }
