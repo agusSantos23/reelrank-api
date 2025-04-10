@@ -15,23 +15,38 @@ class MovieController extends Controller
         $page = $request->input('page', 1);
         $limit = $request->input('limit', 30);
         $genreIdsString = $request->input('genres');
+        $orderBy = $request->input('orderBy', 'title');
+        $searchTerm = $request->input('searchTerm');
 
-        Log::info('Petición de películas recibida:', [
-            'page' => $page,
-            'limit' => $limit,
-            'genres' => $genreIdsString,
-            'all_request_data' => $request->all(),
-        ]);
 
-        $query = Movie::query()->select(['id', 'title', 'release_date', 'runtime', 'score', 'poster_id']);
+        $query = Movie::query()->select([
+            'movies.id',
+            'movies.title',
+            'movies.release_date',
+            'movies.runtime',
+            'movies.score',
+            'movies.poster_id'
+        ])->distinct();
+
+        if ($orderBy === 'release_date' || $orderBy === 'score') {
+            $query->orderBy('movies.' . $orderBy, 'desc');
+        } else {
+            $query->orderBy('movies.' . $orderBy);
+        }
 
         if ($genreIdsString) {
             $genreIds = explode(',', $genreIdsString);
-            Log::info('Filtrando por géneros:', ['genre_ids' => $genreIds]);
-            $query->whereHas('genres', function ($query) use ($genreIds) {
-                $query->whereIn('genres.id', $genreIds);
-            });
+
+            $query->distinct()
+                ->join('movie_genres', 'movies.id', '=', 'movie_genres.movie_id')
+                ->join('genres', 'movie_genres.genre_id', '=', 'genres.id')
+                ->whereIn('genres.id', $genreIds);
         }
+        
+        if ($searchTerm) {
+            $query->where('movies.title', 'LIKE', '%' . $searchTerm . '%');
+        }
+
 
         $movies = $query->paginate($limit, ['*'], 'page', $page)->map(function ($movie) {
             return [
@@ -44,12 +59,15 @@ class MovieController extends Controller
             ];
         });
 
-        Log::info('Filtrando por géneros:', ['moviessss' => $movies]);
-
+        Log::info('Tipo de $movies después de paginate:', [
+            'type' => get_class($movies) 
+        ]);
+        
+        Log::info('Datos de la respuesta:', $movies->toArray()); 
+        
 
         return response()->json($movies);
     }
-
 
     public function show(string $id): JsonResponse
     {
