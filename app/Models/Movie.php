@@ -41,7 +41,6 @@ class Movie extends Model
         'revenue',
         'runtime',
         'status',
-        'tagline',
         'poster_id',
         'backdrop_id',
     ];

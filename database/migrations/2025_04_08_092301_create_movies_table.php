@@ -23,7 +23,6 @@ return new class extends Migration
             $table->bigInteger('revenue')->nullable();
             $table->smallInteger('runtime')->nullable();
             $table->enum('status', ['enabled', 'disabled'])->default('enabled');
-            $table->string('tagline')->nullable();
             $table->string('poster_id', 15)->nullable();
             $table->string('backdrop_id', 20)->nullable();
             $table->timestamps();

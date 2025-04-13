@@ -85,7 +85,6 @@ class MovieController extends Controller
             'revenue' => $movie->revenue,
             'runtime' => $movie->runtime,
             'status' => $movie->status,
-            'tagline' => $movie->tagline,
             'poster_id' => $movie->poster_id,
             'backdrop_id' => $movie->backdrop_id,
             'created_at' => $movie->created_at,
