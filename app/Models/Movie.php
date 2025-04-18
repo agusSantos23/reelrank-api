@@ -10,25 +10,12 @@ class Movie extends Model
 {
     use HasFactory;
 
-    /**
-     * Indicates if the model's ID is auto-incrementing.
-     *
-     * @var bool
-     */
     public $incrementing = false;
 
-    /**
-     * The data type of the auto-incrementing ID.
-     *
-     * @var string
-     */
     protected $keyType = 'string';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    protected $table = 'movies';
+
     protected $fillable = [
         'id',
         'title',
@@ -45,20 +32,10 @@ class Movie extends Model
         'backdrop_id',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'release_date' => 'date',
     ];
 
-    /**
-     * The "booting" method of the model.
-     *
-     * @return void
-     */
     protected static function boot()
     {
         parent::boot();
@@ -70,9 +47,6 @@ class Movie extends Model
         });
     }
 
-    /**
-     * The genres that belong to the movie.
-     */
     public function genres()
     {
         return $this->belongsToMany(Genre::class, 'movie_genres', 'movie_id', 'genre_id');
