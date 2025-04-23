@@ -14,6 +14,8 @@ Route::get('/auth/token/{id}', [UserController::class, 'show']);
 // Auth
 Route::post('/auth/register', [AuthController::class, 'register']);
 
+Route::post('/auth/login', [AuthController::class, 'login']);
+
 
 // Movie
 Route::resource('/movies', MovieController::class);

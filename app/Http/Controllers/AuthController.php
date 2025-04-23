@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\VerificationCodeMail;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -65,12 +66,38 @@ class AuthController extends Controller
 
         Mail::to($user->email)->send(new VerificationCodeMail($user, $verificationCode));
         */
-  
+
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'message' => 'Registered user.Please check your email.',
             'token' => $token,
         ], 201);
+    }
+
+
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:255',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:255',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$/',
+            ],
+        ]);
+
+        if ($validator->fails()) return response()->json(['errors' => 'Invalid send data'], 422);
+        
+
+        $credentials = $request->only('email', 'password');
+
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
+        }
+
+        return response()->json(['token' => $token]);
     }
 }

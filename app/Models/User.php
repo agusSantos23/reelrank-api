@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as AuthenticatableUser; 
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Model implements JWTSubject
+class User extends AuthenticatableUser implements JWTSubject
 {
     use HasFactory;
 
@@ -37,6 +38,10 @@ class User extends Model implements JWTSubject
         'password',
     ];
 
+    protected $casts = [
+        'email_verified_at' => 'datetime', 
+        'password' => 'hashed',
+    ];
 
     protected static function boot()
     {
