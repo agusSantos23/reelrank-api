@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Movie;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ class MovieController extends Controller
                 ->join('genres', 'movie_genres.genre_id', '=', 'genres.id')
                 ->whereIn('genres.id', $genreIds);
         }
-        
+
         if ($searchTerm) {
             $query->where('movies.title', 'LIKE', '%' . $searchTerm . '%');
         }
@@ -60,38 +61,52 @@ class MovieController extends Controller
         });
 
         Log::info('Tipo de $movies después de paginate:', [
-            'type' => get_class($movies) 
+            'type' => get_class($movies)
         ]);
-        
-        Log::info('Datos de la respuesta:', $movies->toArray()); 
-        
+
+        Log::info('Datos de la respuesta:', $movies->toArray());
+
 
         return response()->json($movies);
     }
 
-    public function show(string $id): JsonResponse
+    public function show(string $movieId, ?string $userId = null): JsonResponse
     {
-        $movie = Movie::findOrFail($id)->load('genres:id,name');
-
-        return response()->json([
-            'id' => $movie->id,
-            'title' => $movie->title,
-            'original_title' => $movie->original_title,
-            'overview' => $movie->overview,
-            'original_language' => $movie->original_language,
-            'score' => $movie->score,
-            'release_date' => $movie->release_date,
-            'budget' => $movie->budget,
-            'revenue' => $movie->revenue,
-            'runtime' => $movie->runtime,
-            'status' => $movie->status,
-            'poster_id' => $movie->poster_id,
-            'backdrop_id' => $movie->backdrop_id,
-            'created_at' => $movie->created_at,
-            'updated_at' => $movie->updated_at,
-            'genres' => $movie->genres->map(function ($genre): array {
-                return ['id' => $genre->id, 'name' => $genre->name];
-            }),
-        ]);
+        $movie = Movie::with('genres:id,name')->findOrFail($movieId);
+        $userRelation = null;
+    
+        if ($userId) {
+            $user = User::find($userId);
+            if ($user) {
+                $userMovie = $user->movies()
+                    ->where('movie_id', $movieId)
+                    ->withPivot([
+                        'is_favorite', 
+                        'to_watch', 
+                        'rating', 
+                        'story_rating', 
+                        'acting_rating', 
+                        'visuals_rating', 
+                        'music_rating', 
+                        'entertainment_rating', 
+                        'pacing_rating'
+                    ])
+                    ->first();
+    
+    
+                if (!$userMovie) {
+                    $user->movies()->attach($movieId);
+                    $userMovie = $user->movies()->where('movie_id', $movieId)->first();
+                }
+    
+                $userRelation = $userMovie ? $userMovie->pivot->toArray() : null;
+            }
+        }
+    
+        $responseData = $movie->toArray();
+        $responseData['genres'] = $movie->genres->map(fn ($genre) => ['id' => $genre->id, 'name' => $genre->name]);
+        $responseData['user_relation'] = $userRelation;
+    
+        return response()->json($responseData);
     }
 }

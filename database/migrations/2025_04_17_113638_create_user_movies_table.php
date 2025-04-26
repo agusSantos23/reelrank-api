@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('user_movies', function (Blueprint $table) {
             $table->uuid('user_id');
             $table->uuid('movie_id');
-            $table->boolean('is_favorite')->nullable();
+            $table->boolean('is_favorite')->default(false);
             $table->boolean('to_watch')->nullable();
             $table->unsignedTinyInteger('rating')->nullable();
             $table->unsignedTinyInteger('story_rating')->nullable();

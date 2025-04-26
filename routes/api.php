@@ -6,6 +6,9 @@ use App\Http\Controllers\SagaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserMovieController;
+use App\Http\Middleware\EnsureTokenIsValid;
+
 
 // User
 Route::get('/auth/token/{id}', [UserController::class, 'show']);
@@ -20,7 +23,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 // Movie
 Route::resource('/movies', MovieController::class);
 
-Route::get('/movies/{movie}', [MovieController::class, 'show']);
+Route::get('/movies/{movieId}/{userId?}', [MovieController::class, 'show']);
 
 
 // Genre
@@ -29,3 +32,10 @@ Route::resource('/genres', GenreController::class);
 
 // Saga
 Route::get('/sagas', [SagaController::class, 'index']);
+
+
+Route::middleware(EnsureTokenIsValid::class)->group(function () {
+
+  // Rate Movie of User
+  Route::post('/usermovies/{userId}/{movieId}/rate', [UserMovieController::class, 'submitRating']);
+});
