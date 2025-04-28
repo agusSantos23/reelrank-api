@@ -17,7 +17,7 @@ class UserMovie extends Model
     'user_id',
     'movie_id',
     'is_favorite',
-    'to_watch',
+    'seen',
     'rating',
     'story_rating',
     'acting_rating',

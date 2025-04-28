@@ -33,9 +33,16 @@ Route::resource('/genres', GenreController::class);
 // Saga
 Route::get('/sagas', [SagaController::class, 'index']);
 
-
+// Movie of User
 Route::middleware(EnsureTokenIsValid::class)->group(function () {
 
-  // Rate Movie of User
-  Route::post('/usermovies/{userId}/{movieId}/rate', [UserMovieController::class, 'submitRating']);
+  // Rate 
+  Route::patch('/usermovies/{userId}/{movieId}/rate', [UserMovieController::class, 'submitRating']);
+
+  // Favorite
+  Route::patch('/usermovies/{userId}/{movieId}/favorite', [UserMovieController::class, 'toggleFavorite']);
+
+  // ToWatch
+  Route::patch('/usermovies/{userId}/{movieId}/seen', [UserMovieController::class, 'toggleSeen']);
+
 });

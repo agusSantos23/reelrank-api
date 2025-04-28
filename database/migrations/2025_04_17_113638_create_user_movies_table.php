@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('user_id');
             $table->uuid('movie_id');
             $table->boolean('is_favorite')->default(false);
-            $table->boolean('to_watch')->nullable();
+            $table->boolean('seen')->nullable();
             $table->unsignedTinyInteger('rating')->nullable();
             $table->unsignedTinyInteger('story_rating')->nullable();
             $table->unsignedTinyInteger('acting_rating')->nullable();

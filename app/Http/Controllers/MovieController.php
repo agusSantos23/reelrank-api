@@ -60,13 +60,6 @@ class MovieController extends Controller
             ];
         });
 
-        Log::info('Tipo de $movies después de paginate:', [
-            'type' => get_class($movies)
-        ]);
-
-        Log::info('Datos de la respuesta:', $movies->toArray());
-
-
         return response()->json($movies);
     }
 
@@ -82,7 +75,7 @@ class MovieController extends Controller
                     ->where('movie_id', $movieId)
                     ->withPivot([
                         'is_favorite', 
-                        'to_watch', 
+                        'seen', 
                         'rating', 
                         'story_rating', 
                         'acting_rating', 
@@ -100,6 +93,10 @@ class MovieController extends Controller
                 }
     
                 $userRelation = $userMovie ? $userMovie->pivot->toArray() : null;
+
+                if ($userRelation && isset($userRelation['seen'])) {
+                    $userRelation['seen'] = (bool) $userRelation['seen'];
+                }
             }
         }
     
