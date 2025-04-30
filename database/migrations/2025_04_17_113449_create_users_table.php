@@ -18,13 +18,13 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->boolean('deleted_last_movie_watchlist')->default(false);
-            $table->enum('config_scorer', ['starts', '10', '100'])->default('starts');
+            $table->enum('config_scorer', ['starts', 'slider'])->default('starts');
+            $table->tinyInteger('maximum_star_rating')->default(5);
+            $table->tinyInteger('maximum_slider_rating')->default(10);
             $table->enum('vote_type', ['simple', 'advanced'])->default('simple');
-            $table->enum('status', ['connected', 'disconnected', 'blocked'])->default('disconnected');
             $table->uuid('avatar_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->foreign('avatar_id')->references('id')->on('avatars')->onDelete('cascade');
-            $table->timestamp('login_at')->nullable();
             $table->timestamps();
         });
     }

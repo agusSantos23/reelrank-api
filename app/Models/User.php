@@ -29,9 +29,7 @@ class User extends AuthenticatableUser implements JWTSubject
         'deleted_last_movie_watchlist',
         'config_scorer',
         'vote_type',
-        'status',
         'avatar_id',
-        'login_at',
     ];
 
     protected $hidden = [
