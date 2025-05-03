@@ -43,7 +43,7 @@ class UserMovieController extends Controller
             ->updateExistingPivot($movieId, [$columnToUpdate => $ratingValue]);
 
         if ($updated) {
-            return response()->json(['message' => 'Recorded/updated score correctly']);
+            return response()->json(['message' => 'Recorded score correctly']);
         } else {
             $user->movies()->attach($movieId, [$columnToUpdate => $ratingValue]);
             return response()->json(['message' => 'Recorded score properly']);
@@ -93,8 +93,8 @@ class UserMovieController extends Controller
             if ($updated) {
                 $message = match ($seen) {
                     null => 'Seen status set to unclassified',
-                    true => 'Movie marked as watched',
-                    false => 'Movie marked as seen',
+                    true => 'Movie marked as seen',
+                    false => 'Movie marked as see',
                 };
                 return response()->json(['message' => $message]);
             } else {
@@ -106,8 +106,8 @@ class UserMovieController extends Controller
             $user->movies()->attach($movieId, ['seen' => $seen]);
             $message = match ($seen) {
                 null => 'Seen status set to unclassified',
-                true => 'Movie marked as watched',
-                false => 'Movie marked as seen',
+                true => 'Movie marked as seen',
+                false => 'Movie marked as see',
             };
             return response()->json(['message' => $message]);
         }
