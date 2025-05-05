@@ -34,7 +34,6 @@ class UserController extends Controller
             return response()->json($user);
 
         } else {
-
             return response()->json(['message' => 'The account is not blocked.'], 400);
             
         }

@@ -3,14 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\VerificationCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use App\Mail\VerificationCodeMail;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -31,7 +26,6 @@ class AuthController extends Controller
         }
 
         $data = [];
-
 
         foreach ($request->all() as $key => $value) {
             if ($key !== 'avatarId' && is_string($value)) {
@@ -55,17 +49,6 @@ class AuthController extends Controller
             'avatar_id' => $data['avatarId'],
         ]);
 
-        /*
-        $verificationCode = random_int(100000, 999999);
-
-        VerificationCode::create([
-            'user_id' => $user->id,
-            'code' => $verificationCode,
-            'expires_at' => now()->addMinutes(15),
-        ]);
-
-        Mail::to($user->email)->send(new VerificationCodeMail($user, $verificationCode));
-        */
 
         $token = JWTAuth::fromUser($user);
 
