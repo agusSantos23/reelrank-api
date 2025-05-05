@@ -22,8 +22,11 @@ return new class extends Migration
             $table->tinyInteger('maximum_star_rating')->default(5);
             $table->tinyInteger('maximum_slider_rating')->default(10);
             $table->enum('vote_type', ['simple', 'advanced'])->default('simple');
+            $table->enum('status', ['normal','blocked'])->default('normal');
+            $table->integer('action_count')->default(0);
             $table->uuid('avatar_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('last_action_at')->nullable();
             $table->foreign('avatar_id')->references('id')->on('avatars')->onDelete('cascade');
             $table->timestamps();
         });

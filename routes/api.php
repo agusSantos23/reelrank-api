@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserMovieController;
+use App\Http\Middleware\CheckActionLimit;
 use App\Http\Middleware\EnsureTokenIsValid;
 
 
@@ -36,13 +37,21 @@ Route::get('/sagas', [SagaController::class, 'index']);
 // Movie of User
 Route::middleware(EnsureTokenIsValid::class)->group(function () {
 
-  // Rate 
-  Route::patch('/usermovies/{userId}/{movieId}/rate', [UserMovieController::class, 'submitRating']);
+  // Unblock User
+  Route::post('/user/{userId}/unblock', [UserController::class, 'unblock']);
 
-  // Favorite
-  Route::patch('/usermovies/{userId}/{movieId}/favorite', [UserMovieController::class, 'toggleFavorite']);
+  Route::middleware(CheckActionLimit::class)->group(function () {
+    
+    // Rate 
+    Route::patch('/usermovies/{userId}/{movieId}/rate', [UserMovieController::class, 'submitRating']);
 
-  // ToWatch
-  Route::patch('/usermovies/{userId}/{movieId}/seen', [UserMovieController::class, 'toggleSeen']);
+    // Favorite
+    Route::patch('/usermovies/{userId}/{movieId}/favorite', [UserMovieController::class, 'toggleFavorite']);
+
+    // ToWatch
+    Route::patch('/usermovies/{userId}/{movieId}/seen', [UserMovieController::class, 'toggleSeen']);
+
+  });
 
 });
+
