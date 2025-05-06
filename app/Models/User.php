@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as AuthenticatableUser; 
@@ -64,6 +63,11 @@ class User extends AuthenticatableUser implements JWTSubject
     public function avatar(): BelongsTo
     {
         return $this->belongsTo(Avatar::class, 'avatar_id');
+    }
+
+    public function ratedMovies(): BelongsToMany
+    {
+        return $this->belongsToMany(Movie::class, 'user_movies')->wherePivotNotNull('rating')->withPivot('rating');
     }
 
     public function getJWTIdentifier()

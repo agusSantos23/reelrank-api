@@ -20,6 +20,9 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 
 Route::post('/auth/login', [AuthController::class, 'login']);
 
+// Verify Token
+Route::post('/auth/verify-token', [AuthController::class, 'verifyToken']);
+
 
 // Movie
 Route::resource('/movies', MovieController::class);
@@ -39,6 +42,9 @@ Route::middleware(EnsureTokenIsValid::class)->group(function () {
 
   // Unblock User
   Route::post('/user/{userId}/unblock', [UserController::class, 'unblock']);
+
+  // Statistics User
+  Route::get('/user/{userId}/statistics', [UserController::class, 'userStatistics']);
 
   Route::middleware(CheckActionLimit::class)->group(function () {
     

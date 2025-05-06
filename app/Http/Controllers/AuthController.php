@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -83,4 +85,33 @@ class AuthController extends Controller
 
         return response()->json(['token' => $token]);
     }
+
+    public function verifyToken(Request $request)
+    {
+        $token = $request->input('token');
+
+        if (!$token) return response()->json(['message' => 'Token not proportionate'], 400);
+        
+
+        try {
+            $user = JWTAuth::setToken($token)->authenticate();
+
+            if (!$user) return response()->json(['message' => 'Invalid token'], 401);
+            
+
+            return response()->json(['message' => 'Valid token'], 200);
+
+        } catch (TokenExpiredException $e) {
+            return response()->json(['message' => 'Expired token'], 401);
+
+        } catch (TokenInvalidException $e) {
+            return response()->json(['message' => 'Invalid token'], 401);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error when verifying the token '], 500);
+        
+        }
+    }
+
+
 }
