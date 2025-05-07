@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Movie;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -10,6 +11,60 @@ use Illuminate\Support\Facades\Validator;
 
 class UserMovieController extends Controller
 {
+
+    public function index(Request $request, $userId): JsonResponse
+    {
+        $page = $request->input('page', 1);
+        $limit = $request->input('limit', 30);
+        $searchTerm = $request->input('searchTerm');
+        $listType = $request->input('list');
+
+        $query = Movie::query()->select([
+            'movies.id',
+            'movies.title',
+            'movies.release_date',
+            'movies.runtime',
+            'user_movies.rating as user_rating',
+            'movies.poster_id'
+        ])->distinct();
+
+        $query->join('user_movies', 'movies.id', '=', 'user_movies.movie_id')
+            ->where('user_movies.user_id', $userId);
+
+        if ($listType === 'favorite') {
+            $query->where('user_movies.is_favorite', true);
+
+        } elseif ($listType === 'seen') {
+            $query->where('user_movies.seen', true);
+
+        } elseif ($listType === 'see') {
+            $query->where('user_movies.seen', false);
+
+        }
+
+
+        $query->orderBy('user_movies.rating', 'desc');
+
+
+        if ($searchTerm) {
+            $query->where('movies.title', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        $movies = $query->paginate($limit, ['*'], 'page', $page)->map(function ($movie) {
+            return [
+                'id' => $movie->id,
+                'title' => $movie->title,
+                'releaseYear' => $movie->release_date ? (int) date('Y', strtotime($movie->release_date)) : null,
+                'duration' => $movie->runtime,
+                'score' => $movie->user_rating, 
+                'posterId' => $movie->poster_id,
+            ];
+        });
+
+        return response()->json($movies);
+    }
+
+
     public function submitRating(Request $request, string $userId, string $movieId): JsonResponse
     {
         $allowedRatingColumns = [
@@ -89,7 +144,7 @@ class UserMovieController extends Controller
         if ($user->movies()->where('movie_id', $movieId)->exists()) {
 
             $updated = $user->movies()->updateExistingPivot($movieId, ['seen' => $seen]);
-            
+
             if ($updated) {
                 $message = match ($seen) {
                     null => 'Seen status set to unclassified',

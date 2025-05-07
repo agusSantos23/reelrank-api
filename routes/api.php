@@ -43,6 +43,9 @@ Route::middleware(EnsureTokenIsValid::class)->group(function () {
   // Unblock User
   Route::post('/user/{userId}/unblock', [UserController::class, 'unblock']);
 
+  // User Movies
+  Route::get('/user/movies/{userId}', [UserMovieController::class,'index']);
+
   // Statistics User
   Route::get('/user/{userId}/statistics', [UserController::class, 'userStatistics']);
 
