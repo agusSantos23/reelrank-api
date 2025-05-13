@@ -19,12 +19,6 @@ class UserMovie extends Model
     'is_favorite',
     'seen',
     'rating',
-    'story_rating',
-    'acting_rating',
-    'visuals_rating',
-    'music_rating',
-    'entertainment_rating',
-    'pacing_rating',
   ];
 
   public function user(): BelongsTo

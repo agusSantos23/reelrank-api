@@ -17,12 +17,6 @@ return new class extends Migration
             $table->boolean('is_favorite')->default(false);
             $table->boolean('seen')->nullable();
             $table->unsignedTinyInteger('rating')->nullable();
-            $table->unsignedTinyInteger('story_rating')->nullable();
-            $table->unsignedTinyInteger('acting_rating')->nullable();
-            $table->unsignedTinyInteger('visuals_rating')->nullable();
-            $table->unsignedTinyInteger('music_rating')->nullable();
-            $table->unsignedTinyInteger('entertainment_rating')->nullable();
-            $table->unsignedTinyInteger('pacing_rating')->nullable();
             $table->primary(['user_id', 'movie_id']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('movie_id')->references('id')->on('movies')->onDelete('cascade');
