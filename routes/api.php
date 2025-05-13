@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\GenreController;
 use App\Http\Controllers\SagaController;
+use App\Http\Controllers\UserGenreController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\UserController;
@@ -31,7 +31,7 @@ Route::get('/movies/{movieId}/{userId?}', [MovieController::class, 'show']);
 
 
 // Genre
-Route::resource('/genres', GenreController::class);
+Route::get('/genres/{userId?}', [UserGenreController::class, 'index']);
 
 
 // Saga
@@ -51,15 +51,24 @@ Route::middleware(EnsureTokenIsValid::class)->group(function () {
 
   Route::middleware(CheckActionLimit::class)->group(function () {
     
-    // Rate 
+    // Rate Movie
     Route::patch('/usermovies/{userId}/{movieId}/rate', [UserMovieController::class, 'submitRating']);
 
-    // Favorite
+    // Favorite Movie
     Route::patch('/usermovies/{userId}/{movieId}/favorite', [UserMovieController::class, 'toggleFavorite']);
 
-    // ToWatch
+    // ToWatch Movie
     Route::patch('/usermovies/{userId}/{movieId}/seen', [UserMovieController::class, 'toggleSeen']);
 
+    // Settings
+    // Favorite Genres
+    Route::post('/settings/usergenres/{userId}', [UserGenreController::class,'update']);
+
+    // Select Evaluator
+    Route::post('/settings/evaluator/{userId}', [UserController::class,'selectEvaluator']);
+
+    // Highest Evaluation
+    Route::post('/settings/highest/{userId}/{evaluator}', [UserController::class, 'highestEvaluation']);
   });
 
 });

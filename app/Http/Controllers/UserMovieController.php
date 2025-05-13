@@ -6,13 +6,12 @@ use App\Models\Movie;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class UserMovieController extends Controller
 {
 
-    public function index(Request $request, $userId): JsonResponse
+    public function index(Request $request, string $userId): JsonResponse
     {
         $page = $request->input('page', 1);
         $limit = $request->input('limit', 30);
@@ -63,7 +62,6 @@ class UserMovieController extends Controller
 
         return response()->json($movies);
     }
-
 
     public function submitRating(Request $request, string $userId, string $movieId): JsonResponse
     {

@@ -25,10 +25,13 @@ class User extends AuthenticatableUser implements JWTSubject
         'lastname',
         'email',
         'password',
-        'deleted_last_movie_watchlist',
         'config_scorer',
+        'maximum_star_rating',
+        'maximum_slider_rating',
         'vote_type',
         'avatar_id',
+        'status',
+        'action_count'
     ];
 
     protected $hidden = [

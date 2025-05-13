@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('lastname')->nullable();
             $table->string('email')->unique();
             $table->string('password');
-            $table->boolean('deleted_last_movie_watchlist')->default(false);
             $table->enum('config_scorer', ['starts', 'slider'])->default('starts');
             $table->tinyInteger('maximum_star_rating')->default(5);
             $table->tinyInteger('maximum_slider_rating')->default(10);
