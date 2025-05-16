@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request; 
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -44,7 +46,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($userId);
 
-        
+
         $mostViewedGenre = DB::table('user_movies')
             ->where('user_id', $user->id)
             ->whereNotNull('rating')
@@ -79,8 +81,9 @@ class UserController extends Controller
         return response()->json($statistics);
     }
 
-    
-    public function selectEvaluator(Request $request, string $userId){
+
+    public function selectEvaluator(Request $request, string $userId)
+    {
 
         $validator = Validator::make($request->all(), [
             'value' => 'required|string|in:starts,slider'
@@ -101,7 +104,7 @@ class UserController extends Controller
     public function highestEvaluation(Request $request, string $userId, string $evaluator)
     {
         $validator = Validator::make($request->all(), [
-            'max' => 'required|integer|min:1', 
+            'max' => 'required|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -112,17 +115,67 @@ class UserController extends Controller
 
         if ($evaluator === 'starts') {
             $user->maximum_star_rating = $request->input('max');
-
         } elseif ($evaluator === 'slider') {
             $user->maximum_slider_rating = $request->input('max');
-
         } else {
             return response()->json(['message' => 'Evaluator not valid'], 400);
-
         }
 
         $user->save();
 
         return response()->json(['message' => 'Maximum updated evaluation value correctly']);
+    }
+
+
+    public function update(Request $request, string $userId): JsonResponse
+    {
+        $user = User::findOrFail($userId);
+
+        $rules = [
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => [
+                'sometimes',
+                'string',
+                'min:8',
+                'max:64',
+                'confirmed',
+                Password::min(8)
+                    ->mixedCase()
+                    ->symbols(),
+            ],
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $dataToUpdate = [];
+
+        if ($request->has('email')) {
+            $dataToUpdate['email'] = $request->input('email');
+        }
+
+        if ($request->has('password')) {
+            $dataToUpdate['password'] = Hash::make($request->input('password'));
+        }
+
+        if (!empty($dataToUpdate)) {
+            $user->update($dataToUpdate);
+            return response()->json(['message' => 'Profile updated successfully']);
+        }
+
+        return response()->json(['message' => 'No data to update']);
+    }
+
+
+    public function delete(string $userId): JsonResponse
+    {
+        $user = User::findOrFail($userId);
+
+        $user->delete();
+
+        return response()->json(['message' => 'Your account has been deleted successfully. 👋']);
     }
 }

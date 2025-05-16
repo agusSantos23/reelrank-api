@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Movie;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -76,13 +75,7 @@ class MovieController extends Controller
                     ->withPivot([
                         'is_favorite', 
                         'seen', 
-                        'rating', 
-                        'story_rating', 
-                        'acting_rating', 
-                        'visuals_rating', 
-                        'music_rating', 
-                        'entertainment_rating', 
-                        'pacing_rating'
+                        'rating'
                     ])
                     ->first();
     
@@ -106,4 +99,7 @@ class MovieController extends Controller
     
         return response()->json($responseData);
     }
+
+
+
 }

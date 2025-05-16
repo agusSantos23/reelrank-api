@@ -6,6 +6,8 @@ use App\Models\Movie;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 
 class UserMovieController extends Controller
@@ -66,13 +68,7 @@ class UserMovieController extends Controller
     public function submitRating(Request $request, string $userId, string $movieId): JsonResponse
     {
         $allowedRatingColumns = [
-            'rating',
-            'story_rating',
-            'acting_rating',
-            'visuals_rating',
-            'music_rating',
-            'entertainment_rating',
-            'pacing_rating',
+            'rating'
         ];
 
         $rules = [
@@ -165,4 +161,5 @@ class UserMovieController extends Controller
             return response()->json(['message' => $message]);
         }
     }
+
 }

@@ -37,7 +37,7 @@ Route::get('/genres/{userId?}', [UserGenreController::class, 'index']);
 // Saga
 Route::get('/sagas', [SagaController::class, 'index']);
 
-// Movie of User
+// Token
 Route::middleware(EnsureTokenIsValid::class)->group(function () {
 
   // Unblock User
@@ -48,6 +48,14 @@ Route::middleware(EnsureTokenIsValid::class)->group(function () {
 
   // Statistics User
   Route::get('/user/{userId}/statistics', [UserController::class, 'userStatistics']);
+
+  // Update User
+  Route::patch('/user/{userId}', [UserController::class, 'update']);
+
+  // Delete User
+  Route::delete('/user/{userId}', [UserController::class,'delete']);
+
+
 
   Route::middleware(CheckActionLimit::class)->group(function () {
     

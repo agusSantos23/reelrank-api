@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -19,7 +20,16 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'lastname' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'sometimes',
+                'string',
+                'min:8',
+                'max:64',
+                'confirmed',
+                Password::min(8)
+                    ->mixedCase()
+                    ->symbols(),
+            ],
             'avatarId' => 'nullable|string',
         ]);
 
