@@ -6,9 +6,11 @@ use App\Models\Movie;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+
 
 class UserMovieController extends Controller
 {
@@ -34,13 +36,10 @@ class UserMovieController extends Controller
 
         if ($listType === 'favorite') {
             $query->where('user_movies.is_favorite', true);
-
         } elseif ($listType === 'seen') {
             $query->where('user_movies.seen', true);
-
         } elseif ($listType === 'see') {
             $query->where('user_movies.seen', false);
-
         }
 
 
@@ -57,7 +56,7 @@ class UserMovieController extends Controller
                 'title' => $movie->title,
                 'releaseYear' => $movie->release_date ? (int) date('Y', strtotime($movie->release_date)) : null,
                 'duration' => $movie->runtime,
-                'score' => $movie->user_rating, 
+                'score' => $movie->user_rating,
                 'posterId' => $movie->poster_id,
             ];
         });
@@ -67,13 +66,9 @@ class UserMovieController extends Controller
 
     public function submitRating(Request $request, string $userId, string $movieId): JsonResponse
     {
-        $allowedRatingColumns = [
-            'rating'
-        ];
-
         $rules = [
             'value' => 'required|integer|min:0|max:100',
-            'column' => 'required|string|in:' . implode(',', $allowedRatingColumns),
+            'column' => 'required|string|in:rating',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -87,16 +82,29 @@ class UserMovieController extends Controller
 
         $user = User::findOrFail($userId);
 
+
         $updated = $user->movies()
             ->where('movie_id', $movieId)
             ->updateExistingPivot($movieId, [$columnToUpdate => $ratingValue]);
 
-        if ($updated) {
-            return response()->json(['message' => 'Recorded score correctly']);
-        } else {
+
+        if (!$updated) {
             $user->movies()->attach($movieId, [$columnToUpdate => $ratingValue]);
-            return response()->json(['message' => 'Recorded score properly']);
         }
+
+        $randomNumber = rand(1, 10);
+
+        if ($randomNumber < 4) {
+
+            $averageRating = DB::table('user_movies')
+                ->where('movie_id', $movieId)
+                ->avg('rating');
+
+
+            Movie::where('id', $movieId)->update(['score' => $averageRating]);
+        }
+
+        return response()->json(['message' => 'Score recorded correctly']);
     }
 
     public function toggleFavorite(Request $request, string $userId, string $movieId): JsonResponse
@@ -161,5 +169,4 @@ class UserMovieController extends Controller
             return response()->json(['message' => $message]);
         }
     }
-
 }
