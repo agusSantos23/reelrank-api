@@ -20,7 +20,6 @@ return new class extends Migration
             $table->enum('config_scorer', ['starts', 'slider'])->default('starts');
             $table->tinyInteger('maximum_star_rating')->default(5);
             $table->tinyInteger('maximum_slider_rating')->default(10);
-            $table->enum('vote_type', ['simple', 'advanced'])->default('simple');
             $table->enum('status', ['normal','blocked'])->default('normal');
             $table->tinyInteger('action_count')->default(0);
             $table->uuid('avatar_id')->nullable();

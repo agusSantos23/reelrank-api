@@ -28,7 +28,6 @@ class User extends AuthenticatableUser implements JWTSubject
         'config_scorer',
         'maximum_star_rating',
         'maximum_slider_rating',
-        'vote_type',
         'avatar_id',
         'status',
         'action_count'
